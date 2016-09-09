@@ -1,24 +1,7 @@
-# README
+## Overview ##
+This is just going to be a simple Rails server to serve all the data we collect to our [front end visualization](https://github.com/stevenacalhoun/energy-sight-vis). I'm hoping to host this for free on a service called Heroku. I've worked with it a bit in the past and it's good for quick and dirty Rails servers. This server will basically have two functions:
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+1. Store all the data we have collected
+2. Serve the data in JSON format when the vis requests it
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Might be a small pain to setup on each of your machines so I'm not going to type out all the instructions. We can just look at it later in person.
