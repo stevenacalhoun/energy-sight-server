@@ -11,21 +11,15 @@ class Hot100EntryController < ApplicationController
   end
 
   def create
+    # Params
     @earliestDate = Date.parse(params["earliestDate"])
     @latestDate = Date.parse(params["latestDate"])
+    @country = params["country"]
 
     @results = {}
-    if @earliestDate == @latestDate then
-      @results = Hot100Entry.where(chartWeek: @earliestDate.to_s)
-    else
-      @currentWeek = @earliestDate
-      while @currentWeek <= @latestDate
-        @weekResults = Hot100Entry.where(chartWeek: @earliestDate.to_s)
-        @results[@currentWeek] = @weekResults
 
-        @currentWeek = @currentWeek + 7
-      end
-    end
+    @results = Hot100Entry.select('"chartWeek", artist').where(:chartWeek =>  @earliestDate..(@latestDate+7)).where(:country => @country)
+
     render json: @results
   end
 end
