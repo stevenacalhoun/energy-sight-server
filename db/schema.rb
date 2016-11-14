@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161015155346) do
+ActiveRecord::Schema.define(version: 20161109183114) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,4 +32,41 @@ ActiveRecord::Schema.define(version: 20161015155346) do
     t.string   "country"
   end
 
+  create_table "songs", force: :cascade do |t|
+    t.string   "spotifyID"
+    t.string   "artist"
+    t.string   "title"
+    t.string   "genre"
+    t.string   "albumArtLink"
+    t.decimal  "danceability"
+    t.decimal  "energy"
+    t.decimal  "key"
+    t.decimal  "loudness"
+    t.decimal  "mode"
+    t.decimal  "speechiness"
+    t.decimal  "acousticness"
+    t.decimal  "instrumentalness"
+    t.decimal  "liveness"
+    t.decimal  "valence"
+    t.decimal  "tempo"
+    t.integer  "timeSignature"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "top_charts", force: :cascade do |t|
+    t.integer  "song_id"
+    t.integer  "rank"
+    t.string   "change"
+    t.integer  "peakPos"
+    t.integer  "lastPos"
+    t.integer  "weeks"
+    t.datetime "chartWeek"
+    t.string   "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["song_id"], name: "index_top_charts_on_song_id", using: :btree
+  end
+
+  add_foreign_key "top_charts", "songs"
 end
