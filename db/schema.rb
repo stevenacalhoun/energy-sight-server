@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20161109183114) do
   end
 
   create_table "songs", force: :cascade do |t|
-    t.string   "spotifyID"
+    t.string   "spotify_id"
     t.string   "artist"
     t.string   "title"
     t.string   "genre"
@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 20161109183114) do
     t.decimal  "liveness"
     t.decimal  "valence"
     t.decimal  "tempo"
-    t.integer  "timeSignature"
+    t.integer  "time_signature"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
   end
@@ -58,10 +58,10 @@ ActiveRecord::Schema.define(version: 20161109183114) do
     t.integer  "song_id"
     t.integer  "rank"
     t.string   "change"
-    t.integer  "peakPos"
-    t.integer  "lastPos"
+    t.integer  "peak_pos"
+    t.integer  "last_pos"
     t.integer  "weeks"
-    t.datetime "chartWeek"
+    t.datetime "chart_week"
     t.string   "country"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

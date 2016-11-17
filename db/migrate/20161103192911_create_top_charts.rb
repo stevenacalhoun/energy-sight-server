@@ -7,10 +7,10 @@ class CreateTopCharts < ActiveRecord::Migration[5.0]
       # Chart info
       t.integer :rank
       t.string :change
-      t.integer :peakPos
-      t.integer :lastPos
+      t.integer :peak_pos
+      t.integer :last_pos
       t.integer :weeks
-      t.datetime :chartWeek
+      t.datetime :chart_week
       t.string :country
 
       t.timestamps
