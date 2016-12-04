@@ -9,9 +9,10 @@ namespace :import_db do
     puts "Fixing artist names"
     Rake::Task["fix_artist_names:fix"].invoke
 
+    puts "Spotify stuff"
+    
+
     puts "Removing duplicate songs"
     Rake::Task["duplicate_song_removal:remove"].invoke
-
-    puts "Spotify stuff"
   end
 end

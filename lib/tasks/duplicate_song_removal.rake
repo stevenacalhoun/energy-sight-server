@@ -8,14 +8,25 @@ namespace :duplicate_song_removal do
       if j%100 == 0
         puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
       end
-      
+
       puts duplicateSong.artist + ": " + duplicateSong.title
 
       # Get all songs matching this artist/title combo
-      matchingSongs = Song.select(:id).where(artist: duplicateSong.artist, title: duplicateSong.title)
+      matchingSongs = Song.select(:id,:albumArtLink).where(artist: duplicateSong.artist, title: duplicateSong.title)
 
-      # Pick the first song as the "true song"
-      trueSong = matchingSongs.first
+      # Pick the song with album art link as the "true song"
+      trueSong = nil
+      matchingSongs.each do |matchingSong|
+        if matchingSong.albumArtLink != nil
+          trueSong = matchingSong
+        end
+      end
+
+      # Or just take the first one if no song has album art
+      if trueSong == nil
+        trueSong = matchingSongs.first
+      end
+
       i = 0
       matchingSongs.each do |matchingSong|
         if matchingSong.id != trueSong.id
