@@ -12,8 +12,8 @@ namespace :spotifyid_populate do
     error_count = 0
     progress = 0
     uk_search = false
-    Hot100Entry.select(:id, :title, :artist, :spotifyID, :spotifyLink).distinct.find_each do |entry|
-      if entry.spotifyID.eql? 'None' || entry.spotifyID.nil?
+    Hot100Entry.select(:title, :artist, :spotifyID, :spotifyLink).distinct.all.each do |entry|
+      if (entry.spotifyID == 'None' || entry.spotifyID.nil?)
         # Hit API
         begin
           if uk_search
@@ -43,7 +43,7 @@ namespace :spotifyid_populate do
           end
         end
         # Can't find song
-        if search_result.empty? || search_result.nil?
+        if (search_result.empty? || search_result.nil?)
           if uk_search
             uk_search = false
             couldnt_find += 1
@@ -55,13 +55,13 @@ namespace :spotifyid_populate do
         end
         found = false
         search_result.each do |track|
-          if track.artists.map{|a| a.name}.include? entry.artist
+          if (track.artists.map{|a| a.name}.include?(entry.artist))
             found = true
             entry.spotifyID = track.id
             entry.spotifyLink = track.href
             entry.save
             replaced_ids = 0
-            Hot100Entry.where(title: entry.title, artist: entry.artist).find_each do |dupe|
+            Hot100Entry.where(title: entry.title, artist: entry.artist).all.each do |dupe|
               dupe.spotifyID = entry.spotifyID
               dupe.spotifyLink = entry.spotifyLink
               dupe.save
