@@ -12,6 +12,12 @@ namespace :import_db do
     puts "Removing duplicate songs"
     Rake::Task["duplicate_song_removal:remove"].invoke
 
-    puts "Spotify stuff"
+    puts "Hitting API for missing Spotify IDs"
+    Rake::Task["spotifyid_populate:all"].invoke
+
+    puts "Hitting API for genre, album artwork, and audio features"
+    Rake::Task["audiofeatures_populate:all"].invoke
+
+    puts "Done!"
   end
 end
