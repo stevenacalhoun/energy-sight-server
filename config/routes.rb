@@ -12,5 +12,11 @@ Rails.application.routes.draw do
     scope '/song' do
       get '/' => 'song_info#index'
     end
+    scope '/artist' do
+      get '/' => 'artist_info#index'
+      scope ':artist' do
+        get '/' => 'artist_info#show'
+      end
+    end
   end
 end
