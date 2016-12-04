@@ -1,16 +1,16 @@
 namespace :import_db do
-  task fix: :import do
-    puts "Impoting data"
-    Rake::Task["csv_import:all"].invoke
+  task import: :environment do
+    # puts "Importing data"
+    # Rake::Task["csv_import:all"].invoke
 
     puts "Shifting Data"
-    Rake::Task["shift_table:shift"]
+    Rake::Task["shift_tables:shift"].invoke
 
     puts "Fixing artist names"
-    Rake::Task["fix_artist_names:fix"]
+    Rake::Task["fix_artist_names:fix"].invoke
 
     puts "Removing duplicate songs"
-    Rake::Task["duplicate_song_removal:remove"]
+    Rake::Task["duplicate_song_removal:remove"].invoke
 
     puts "Spotify stuff"
   end

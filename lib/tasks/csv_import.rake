@@ -28,7 +28,7 @@ namespace :csv_import do
 
     i = 0
     csv.each do |row|
-      if i % 100 == 0
+      if i % 10000 == 0
         puts "Progress: " + i.to_s + "/" + csv.length.to_s
       end
       # Add each entry
