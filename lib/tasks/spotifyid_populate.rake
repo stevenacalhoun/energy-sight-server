@@ -55,18 +55,17 @@ namespace :spotifyid_populate do
         end
         found = false
         search_result.each do |track|
-          if (track.artists.map{|a| a.name}.include?(entry.artist))
-            found = true
-            entry.spotifyID = track.id
-            entry.spotifyLink = track.href
-            entry.save
-            replaced_ids = 0
-            Hot100Entry.where(title: entry.title, artist: entry.artist).all.each do |dupe|
-              dupe.spotifyID = entry.spotifyID
-              dupe.spotifyLink = entry.spotifyLink
-              dupe.save
-              matched += 1
+          track.artists.map{ |a| a.name }.each do |artist_name|
+            if entry.artist.include?(artist_name)
+              found = true
+              entry.spotifyID = track.id
+              entry.spotifyLink = track.href
+              entry.save
+              matched += Hot100Entry.where(title: entry.title, artist: entry.artist).update_all(spotifyID: entry.spotifyID, spotifyLink: entry.spotifyLink)
+              break
             end
+          end
+          if found
             break
           end
         end
