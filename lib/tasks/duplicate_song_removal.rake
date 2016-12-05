@@ -9,8 +9,6 @@ namespace :duplicate_song_removal do
         puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
       end
 
-      puts duplicateSong.artist + ": " + duplicateSong.title
-
       # Get all songs matching this artist/title combo
       matchingSongs = Song.select(:id,:albumArtLink).where(artist: duplicateSong.artist, title: duplicateSong.title)
 

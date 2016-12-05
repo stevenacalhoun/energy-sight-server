@@ -17,10 +17,10 @@ namespace :import_db do
     #
     # puts "Removing duplicate songs"
     # Rake::Task["duplicate_song_removal:remove"].invoke
-
+    #
     # puts "Adding genre"
     # Rake::Task["genre_populate:all"].invoke
-
-    puts "Done!"
+    #
+    # puts "Done!"
   end
 end
