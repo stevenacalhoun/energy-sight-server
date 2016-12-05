@@ -7,11 +7,9 @@ namespace :audiofeatures_populate do
     no_track = 0
     no_features = 0
     num_total = 2*Song.count
-    puts "Total: #{num_total} records to process (double count for genre and audio features)."
-    puts "Population completes at around 80% (probably forgot to count some records in progress)."
+    puts "Total: #{num_total} records to process (double count for album art and audio features)."
     progress = 0
-    num_retries = 0
-    id_batch_100 = Array.new # API accepts 100 IDs at a time for attributes
+    id_batch_100 = Array.new # API accepts 100 IDs at a time for features
     id_batch_50 = Array.new # API accepts 50 IDs at a time for tracks
     Song.select(:spotify_id).distinct.all.each do |entry|
       if id_batch_50.length < 50
@@ -29,17 +27,7 @@ namespace :audiofeatures_populate do
             if track.nil?
               no_track += 1
             else
-              matched += 1
-              Song.where(spotify_id: id).all.each do |match|
-                puts track.album.genres
-                if match.genre.nil?
-                  match.genre = track.album.genres.first
-                end
-                if match.albumArtLink.nil?
-                  match.albumArtLink = track.album.images.empty? ? nil : track.album.images.first["url"]
-                end
-                match.save
-              end
+              matched += Song.where(spotify_id: id).update_all(albumArtLink: (track.album.images.empty? ? nil : track.album.images.first["url"]))
             end
           end
           if do_audio_features
@@ -50,8 +38,8 @@ namespace :audiofeatures_populate do
               if features.nil?
                 no_features += 1
               else
-                matched += 1
                 Song.where(spotify_id: id).all.each do |match|
+                  matched += 1
                   if match.danceability.nil?  
                     begin
                       match.danceability = features.danceability
