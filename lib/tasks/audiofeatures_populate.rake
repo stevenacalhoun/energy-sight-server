@@ -12,13 +12,12 @@ namespace :audiofeatures_populate do
     id_batch_100 = Array.new # API accepts 100 IDs at a time for features
     id_batch_50 = Array.new # API accepts 50 IDs at a time for tracks
     Song.select(:spotify_id).distinct.all.each do |entry|
-      if id_batch_50.length < 50
-        if (entry.spotify_id.nil? || entry.spotify_id == "None")
-          no_id += 1
-        else
-          id_batch_50 << entry.spotify_id
-        end
+      if (entry.spotify_id.nil? || entry.spotify_id == "None")
+        no_id += 1
       else
+        id_batch_50 << entry.spotify_id
+      end
+      if id_batch_50.length == 50
         id_batch_100 += id_batch_50
         do_audio_features = (id_batch_100.length == 100)
         begin
@@ -244,7 +243,7 @@ namespace :audiofeatures_populate do
         end
       end
       if (matched + no_id + no_track + no_features) >= num_total*progress/100
-        puts "#{progress}%: #{matched} matches, #{no_id} tracks w/o ID, #{no_track} tracks w/o Spotify entries (but with non-null and non-\"None\" ID), #{no_features} tracks w/o audio features."
+        puts "#{progress}%: #{matched} matches, #{no_id} tracks w/o ID, #{no_track} tracks w/o Spotify entries (but with non-null and non-\"None\" ID), #{no_features} tracks w/o audio feature info."
         progress += 1
       end
     end
