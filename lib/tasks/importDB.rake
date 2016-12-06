@@ -21,6 +21,9 @@ namespace :import_db do
     # puts "Adding genre"
     # Rake::Task["genre_populate:all"].invoke
     #
+    # puts "Removing songs with similar capitalizations"
+    # Rake::Task["song_artist_capitalization:remove"].invoke
+    #
     # puts "Done!"
   end
 end
