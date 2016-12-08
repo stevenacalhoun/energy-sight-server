@@ -20,8 +20,11 @@ class Hot100EntryController < ApplicationController
     @country = params[:country]
     @rank = params[:minRank]
     @artist = params[:artist]
-
+    #
     @results = TopChart.select('top_charts.chart_week, top_charts.country, songs.artist, songs.title, top_charts.rank').joins(:song).where('top_charts.chart_week' => @earliestDate..(@latestDate+7)).where("top_charts.rank <= "+@rank.to_s)
+
+    # @results = TopChart.select('DISTINCT ON (top_charts.chart_week, top_charts.country, songs.artist) top_charts.chart_week, top_charts.country, songs.artist').joins(:song).where('top_charts.chart_week' => @earliestDate..(@latestDate+7)).where("top_charts.rank <= "+@rank.to_s)
+
 
     if @artist != "all"
       @results = @results.where(:artist => @artist)
@@ -29,6 +32,16 @@ class Hot100EntryController < ApplicationController
     if @country != "both"
       @results = @results.where(:country => @country)
     end
+
+    # @artists = []
+    #
+    # @results.each do |entry|
+    #   if @artists.include? entry.artist
+    #     @artists.append(entry.artist)
+    #   end
+    # end
+
+
 
     render json: @results
   end
