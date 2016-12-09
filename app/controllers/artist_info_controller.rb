@@ -8,7 +8,7 @@ class ArtistInfoController < ApplicationController
     @latestDate = Date.parse(params[:endDate])
 
 
-    @results = TopChart.select('top_charts.chart_week, top_charts.country, songs.spotify_id, songs.artist, songs.title, top_charts.rank, songs."albumArtLink"').joins(:song).where('top_charts.chart_week' => @earliestDate..(@latestDate+7)).where('songs.artist' => @artist)
+    @results = TopChart.select('top_charts.chart_week, top_charts.country, songs.spotify_id, songs.artist, songs.title, top_charts.rank, songs.preview_url, songs."albumArtLink"').joins(:song).where('top_charts.chart_week' => @earliestDate..(@latestDate+7)).where('songs.artist' => @artist)
 
     render json: @results
   end
