@@ -23,54 +23,52 @@ class Hot100EntryController < ApplicationController
     # Make DB query
     results = TopChart.select('top_charts.chart_week, top_charts.country, songs.artist, songs.title, top_charts.rank').joins(:song).where('top_charts.chart_week' => earliestDate..(latestDate)).where("top_charts.rank <= "+rank.to_s)
 
-    # Data containers
-    artists = []
-    usDataDict = {}
-    ukDataDict = {}
+    # Prepare combine results
+    aggregatedResults = {
+      "us" => {},
+      "uk" => {},
+      "artists" => ["woo"]
+    }
 
     # Create array of dates
     dateArray = createDateArray(earliestDate, latestDate, aggregateSetting)
 
-    # Put together list of artists
-    results.each do |entry|
-      if (artists.include? entry['artist']) == false
-        artists.append(entry['artist'])
-      end
-    end
-
     # Initialize data us/uk containers
     dateArray.each do |date|
+      # Get correct key
       if aggregateSetting == "year"
         dateObj = Date.new(date[0].to_i, 1, 1)
       else
         dateObj = Date.new(date.split('/')[1].to_i, date.split('/')[0].to_i, 1)
       end
 
-      usDataDict[date] = {"key": dateObj}
-      ukDataDict[date] = {"key": dateObj}
-
-      artists.each do |artist|
-        usDataDict[date][artist] = 0
-        ukDataDict[date][artist] = 0
-      end
+      # Add each date
+      aggregatedResults['us'][date] = {"key": dateObj}
+      aggregatedResults['uk'][date] = {"key": dateObj}
     end
 
     # Aggregate results
     results.each do |entry|
+      # Create keys
       dateKey = createDateKey(entry.chart_week, aggregateSetting)
-      if entry['country'] == 'us'
-        usDataDict[dateKey][entry['artist']] = usDataDict[dateKey][entry['artist']] + 1
-      else
-        ukDataDict[dateKey][entry['artist']] = ukDataDict[dateKey][entry['artist']] + 1
+      country = entry['country']
+      artist = entry['artist']
+
+      # Put together a list of artists
+      if (aggregatedResults['artists'].include? artist) == false
+        aggregatedResults['artists'].append(artist)
       end
+
+      # Add/increment artists' entry
+      if aggregatedResults[country][dateKey].key?([artist]) == false
+        aggregatedResults[country][dateKey][artist] = 0
+      end
+      aggregatedResults[country][dateKey][artist] += 1
     end
 
-    # Prepare combine results
-    aggregatedResults = {
-      "us": flattenDict(usDataDict),
-      "uk": flattenDict(ukDataDict),
-      "artists": artists
-    }
+    # Flatten
+    aggregatedResults['us'] = flattenDict(aggregatedResults['us'])
+    aggregatedResults['uk'] = flattenDict(aggregatedResults['uk'])
 
     render json: aggregatedResults
   end
