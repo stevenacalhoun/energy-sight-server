@@ -37,7 +37,7 @@ class Hot100EntryController < ApplicationController
     dateArray.each do |date|
       # Get correct key
       if aggregateSetting == "year"
-        dateObj = Date.new(date[0].to_i, 1, 1)
+        dateObj = Date.new(date.to_i, 1, 1)
       else
         dateObj = Date.new(date.split('/')[1].to_i, date.split('/')[0].to_i, 1)
       end

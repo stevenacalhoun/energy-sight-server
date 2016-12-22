@@ -1,7 +1,7 @@
 namespace :artist_populate do
   task populate: :environment do
     # Get all entries
-    entries = TopChart.select(:id, :song_id)
+    entries = TopChart.select(:id, :song_id, :artist).where(artist: nil)
     i = 0
     entries.each do |entry|
       # Print progress
