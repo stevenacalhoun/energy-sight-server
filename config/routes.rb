@@ -9,8 +9,11 @@ Rails.application.routes.draw do
         end
       end
     end
-    scope '/song' do
+    scope '/test' do
       get '/' => 'song_info#index'
+      scope ':value' do
+        get '/' => 'song_info#show'
+      end
     end
     scope '/artist' do
       get '/' => 'artist_info#index'
