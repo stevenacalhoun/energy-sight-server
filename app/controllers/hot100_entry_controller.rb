@@ -21,13 +21,13 @@ class Hot100EntryController < ApplicationController
     aggregateSetting = params[:aggregateSetting]
 
     # Make DB query
-    results = TopChart.select('top_charts.chart_week, top_charts.country, songs.artist, songs.title, top_charts.rank').joins(:song).where('top_charts.chart_week' => earliestDate..(latestDate)).where("top_charts.rank <= "+rank.to_s)
+    results = TopChart.select(:chart_week, :country, :artist, :rank).where(:chart_week => earliestDate..(latestDate)).where("rank <= "+rank.to_s)
 
     # Prepare combine results
     aggregatedResults = {
       "us" => {},
       "uk" => {},
-      "artists" => ["woo"]
+      "artists" => []
     }
 
     # Create array of dates
@@ -60,7 +60,7 @@ class Hot100EntryController < ApplicationController
       end
 
       # Add/increment artists' entry
-      if aggregatedResults[country][dateKey].key?([artist]) == false
+      if aggregatedResults[country][dateKey].key?(artist) == false
         aggregatedResults[country][dateKey][artist] = 0
       end
       aggregatedResults[country][dateKey][artist] += 1
