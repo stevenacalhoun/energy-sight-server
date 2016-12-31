@@ -1,5 +1,50 @@
-namespace :fix_artist_names do
-  task fix: :environment do
+namespace :fix_data do
+  # Fix capitalization errors
+  task song_artist_capitalization: :environment do
+    songsRemoved = 0
+    duplicateSongs = Song.select('lower(artist) as artist','lower(title) as title').group('lower(artist)','lower(title)').having("count(*) > 1")
+
+    j = 0
+    duplicateSongs.each do |duplicateSong|
+      if j%100 == 0
+        puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
+      end
+
+      # Get all songs matching this artist/title combo
+      matchingSongs = Song.select(:id,:albumArtLink).where("lower(artist) = ? and lower(title) = ?", duplicateSong.artist, duplicateSong.title)
+
+      # Pick the song with album art link as the "true song"
+      trueSong = nil
+      matchingSongs.each do |matchingSong|
+        if matchingSong.albumArtLink != nil
+          trueSong = matchingSong
+        end
+      end
+
+      # Or just take the first one if no song has album art
+      if trueSong == nil
+        trueSong = matchingSongs.first
+      end
+
+      matchingSongs.each do |matchingSong|
+        if matchingSong.id != trueSong.id
+          songsRemoved = songsRemoved + 1
+
+          # Update entries to "true song" id
+          topChartSongEntries = TopChart.select(:id, :song_id).where(song_id: matchingSong.id).update_all(song_id: trueSong.id)
+
+          # Delete matching song
+          Song.destroy(matchingSong.id)
+        end
+      end
+      j = j+1
+    end
+    puts "Removed " + songsRemoved.to_s + " songs"
+    puts "Kept " + j.to_s + " songs"
+  end
+
+  # Fix missing articles, remove "featuring" etc.
+  task artist_names: :environment do
     # artists = createArtistDictFromDb()
     artistChanges = createArtistDictFromFile('artist_names.txt')
 
@@ -23,6 +68,48 @@ namespace :fix_artist_names do
       if artist != artistChanges[artist]
         artistsMatch = Song.select(:artist).where(artist: artist).update_all(artist: artistChanges[artist])
       end
+    end
+  end
+
+  # Remove duplicate songs based on title/artist
+  task duplicate_songs: :environment do
+    duplicateSongs = Song.select(:artist,:title).group(:artist,:title).having("count(*) > 1")
+    puts duplicateSongs.length.to_s + " songs have the same artist and title value"
+
+    j = 0
+    duplicateSongs.each do |duplicateSong|
+      if j%100 == 0
+        puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
+      end
+
+      # Get all songs matching this artist/title combo
+      matchingSongs = Song.select(:id,:albumArtLink).where(artist: duplicateSong.artist, title: duplicateSong.title)
+
+      # Pick the song with album art link as the "true song"
+      trueSong = nil
+      matchingSongs.each do |matchingSong|
+        if matchingSong.albumArtLink != nil
+          trueSong = matchingSong
+        end
+      end
+
+      # Or just take the first one if no song has album art
+      if trueSong == nil
+        trueSong = matchingSongs.first
+      end
+
+      i = 0
+      matchingSongs.each do |matchingSong|
+        if matchingSong.id != trueSong.id
+          # Update entries to "true song" id
+          topChartSongEntries = TopChart.select(:id, :song_id).where(song_id: matchingSong.id).update_all(song_id: trueSong.id)
+
+          # Delete matching song
+          Song.destroy(matchingSong.id)
+        end
+        i = i+1
+      end
+      j = j+1
     end
   end
 end

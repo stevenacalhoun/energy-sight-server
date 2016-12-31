@@ -1,5 +1,12 @@
-namespace :shift_tables do
-  task shift: :environment do
+namespace :import_data do
+  # Import raw data into hot100 table
+  task import_csv: :environment do
+    importCountryData('us')
+    importCountryData('uk')
+  end
+
+  # Split hot100 to songs and top_charts
+  task split_data: :environment do
     # Update all None spotify ids to nil
     Hot100Entry.where(spotifyID: "None").update_all(spotifyID: nil)
 
@@ -45,5 +52,39 @@ namespace :shift_tables do
     end
     puts "Creating top chart entries, no progress meter"
     TopChart.create(topChartCreates)
+  end
+
+  # Add artist to Top Chart
+  task add_artist_to_top_chart: :environment do
+    # Get all entries
+    entries = TopChart.select(:id, :song_id, :artist).where(artist: nil)
+    i = 0
+    entries.each do |entry|
+      # Print progress
+      if i%1000 == 0
+        puts "Progress: " + i.to_s + "/" + entries.length.to_s
+      end
+      i = i + 1
+
+      # Get corresponding song and add artist to entry
+      songEntry = Song.select(:artist).where(id: entry.song_id)
+      entry.update(artist: songEntry[0].artist)
+    end
+  end
+end
+
+def importCountryData(country)
+  csv_text = File.read('data/'+country+'.csv')
+  csv = CSV.parse(csv_text)
+
+  i = 0
+  csv.each do |row|
+    if i % 10000 == 0
+      puts "Progress: " + i.to_s + "/" + csv.length.to_s
+    end
+
+    # Add each entry
+    Hot100Entry.create(title: row[0], artist: row[1], peakPos: row[2], lastPos: row[3], weeks: row[4], rank: row[5], change: row[6], spotifyID: row[7], spotifyLink: row[8], videoLink: row[9], chartWeek: row[10], country: country)
+    i = i+1
   end
 end
