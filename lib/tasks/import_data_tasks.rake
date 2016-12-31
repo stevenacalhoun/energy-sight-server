@@ -1,5 +1,5 @@
 namespace :import_data do
-  # Import raw data into hot100 table
+  # Import raw data into database
   task import_csv: :environment do
     importCountryData('us')
     importCountryData('uk')
