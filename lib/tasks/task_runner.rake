@@ -12,19 +12,22 @@ namespace :task_runner do
     # puts "Fixing artist names"
     # Rake::Task["fix_data:artist_names"].invoke
     #
-    # puts "Hitting API for missing Spotify IDs"
+    # puts "Getting missing Spotify IDs from Spotify"
     # Rake::Task["spotify:get_missing_ids"].invoke
     #
-    # puts "Hitting API for album artwork, and audio features"
-    # Rake::Task["spotify:get_song_details"].invoke
+    # puts "Getting audio features from Spotify"
+    # Rake::Task["spotify:get_audio_features"].invoke
+    #
+    # puts "Getting album artwork from Spotify"
+    # Rake::Task["spotify:get_album_art_link"].invoke
     #
     # puts "Removing duplicate songs"
     # Rake::Task["fix_data:duplicate_songs"].invoke
     #
-    # puts "Adding genre"
+    # puts "Getting genre from Spotify"
     # Rake::Task["spotify:get_genre"].invoke
     #
-    # puts "Adding Preview URL"
+    # puts "Getting song preview URL from Spotify"
     # Rake::Task["spotify:get_song_preview_url"].invoke
     #
     # puts "Removing songs with similar capitalizations"
