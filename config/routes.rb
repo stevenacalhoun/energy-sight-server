@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     scope '/artist' do
       get '/' => 'artist_info#index'
       scope ':artist' do
-        get '/' => 'artist_info#show'
+        get '/' => 'artist_info#show', :constraints => {:artist => /[^\/]+/ }
       end
     end
   end
