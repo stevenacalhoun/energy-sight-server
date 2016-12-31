@@ -23,8 +23,7 @@ namespace :spotify do
           track.artists.each do |artist|
             # Update song with link and ID
             if entry.artist.include?(artist.name)
-              entry.spotifyID = track.id
-              entry.spotifyLink = track.href
+              entry.spotify_id = track.id
               entry.save
 
               foundIds += 1
