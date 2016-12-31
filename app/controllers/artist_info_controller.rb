@@ -3,14 +3,12 @@ class ArtistInfoController < ApplicationController
     render text: 'heyo'
   end
   def show
-    @artist = params[:artist]
-    @earliestDate = Date.parse(params[:startDate])
-    @latestDate = Date.parse(params[:endDate])
+    artist = params[:artist]
+    earliestDate = Date.parse(params[:startDate])
+    latestDate = Date.parse(params[:endDate])
 
-    puts @artist
+    results = TopChart.select('top_charts.chart_week, top_charts.country, songs.spotify_id, songs.artist, songs.title, top_charts.rank, songs.preview_url, songs."albumArtLink"').joins(:song).where('top_charts.chart_week' => earliestDate..(latestDate+7)).where('songs.artist' => artist)
 
-    @results = TopChart.select('top_charts.chart_week, top_charts.country, songs.spotify_id, songs.artist, songs.title, top_charts.rank, songs.preview_url, songs."albumArtLink"').joins(:song).where('top_charts.chart_week' => @earliestDate..(@latestDate+7)).where('songs.artist' => @artist)
-
-    render json: @results
+    render json: results
   end
 end

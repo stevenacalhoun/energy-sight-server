@@ -1,16 +1,7 @@
 require 'date'
 
-class Hot100EntryController < ApplicationController
+class TopChartsController< ApplicationController
   def index
-    # Params
-    earliestDate = Date.parse(params[:startDate])
-    latestDate = Date.parse(params[:endDate])
-    rank = params[:minRank]
-
-    results = Hot100Entry.select('"chartWeek", artist, rank').where(:chartWeek =>  earliestDate..(latestDate+7)).where(:country => country)
-    .where("rank <= "+rank.to_s)
-
-    render json: results
   end
 
   def show

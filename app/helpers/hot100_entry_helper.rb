@@ -1,2 +1,0 @@
-module Hot100EntryHelper
-end

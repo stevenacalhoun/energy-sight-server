@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
   scope '/api' do
     scope '/charts' do
-      get '/' => 'hot_100_entry#index'
+      get '/' => 'top_charts#index'
       scope ':country' do
-        get '/' => 'hot_100_entry#show', :artist => "all"
+        get '/' => 'top_charts#show', :artist => "all"
         scope ':artist' do
-          get '/' => 'hot_100_entry#show'
+          get '/' => 'top_charts#show'
         end
       end
     end
