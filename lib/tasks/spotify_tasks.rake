@@ -3,14 +3,17 @@ require 'rspotify'
 namespace :spotify do
   # Search for songs to fill in missing ids
   task get_missing_ids: :environment do
-    foundIds = 0
-    i = 0
-    songsWithoutIds = Song.where(spotify_id: nil)
+    puts "Filling in missing Spotify IDs"
 
+    songsWithoutIds = Song.where(spotify_id: nil)
+    foundIds = 0
+
+    i = 0
     songsWithoutIds.each do |song|
       if i%100 == 0
         puts "Progress: " + i.to_s + "/" + songsWithoutIds.count.to_s
       end
+      i += 1
       # Search by title
       search_results = RSpotify::Track.search(entry.title, market: 'US')
 
@@ -31,7 +34,6 @@ namespace :spotify do
           end
         end
       end
-      i += 1
     end
     puts "New found IDs: " + foundIds.to_s
     puts "IDs still missing: " + (songsWithoutIds.count - foundIds).to_s
@@ -39,6 +41,8 @@ namespace :spotify do
 
   # Get song's genres
   task get_genre: :environment do
+    puts "Retrieving genre from Spotify"
+
     # Genre categories
     categories = {
       "rock": ["rock"],
@@ -53,21 +57,19 @@ namespace :spotify do
       "jazz": ["jazz"]
     }
 
-    # Counters
-    i = 0
-    foundGenres = 0
-
     # Get all songs with spotify ids
     songsWithIds = Song.select(:spotify_id).where.not(spotify_id: nil).where(genre: nil)
+    foundGenres = 0
 
     # Batch ids and search 50 at a time
     batch = []
+    i = 0
     songsWithIds.each do |song|
       # Print progress
       if i%1000 == 0
         puts "Progress: " + i.to_s + "/" + songs.length.to_s
       end
-      i = i + 1
+      i += 1
 
       batch.push(song.spotify_id)
       if batch.length == 50
@@ -108,20 +110,21 @@ namespace :spotify do
 
   # Get album art link
   task get_album_art_link: :environment do
-    i = 0
-    foundAlbumArtLinks = 0
+    puts "Retrieving album art link from Spotify"
 
     # Get all songs with spotify ids
     songsWithIds = Song.select(:spotify_id).where.not(spotify_id: nil).where(album_art_link: nil)
+    foundAlbumArtLinks = 0
 
     # Batch 50 ids and search all at once
     batch =[]
+    i = 0
     songsWithIds do |song|
       # Print progress
       if i%1000 == 0
         puts "Progress: " + i.to_s + "/" + songs.length.to_s
       end
-      i = i + 1
+      i += 1
 
       batch.push(song.spotify_id)
       if batch.length == 50
@@ -156,20 +159,21 @@ namespace :spotify do
 
   # Get audio features for songs
   task get_audio_features: :environment do
-    i = 0
-    foundAudioFeatures = 0
+    puts "Retrieving audio features from Spotify"
 
     # Get all songs with spotify ids
     songsWithIds = Song.select(:spotify_id).where.not(spotify_id: nil).where(danceability: nil)
+    foundAudioFeatures = 0
 
     # Batch 50 ids and search all at once
     batch =[]
+    i = 0
     songsWithIds do |song|
       # Print progress
       if i%1000 == 0
         puts "Progress: " + i.to_s + "/" + songs.length.to_s
       end
-      i = i + 1
+      i += 1
       batch.push(song.spotify_id)
 
       if batch.length == 50
@@ -230,20 +234,21 @@ namespace :spotify do
 
   # Get preview URL
   task get_song_preview_url: :environment do
-    i = 0
-    foundPreviewUrls = 0
+    puts "Retrieving preview url from Spotify"
 
     # Get all songs with a spotify id and no preview_url
     songs = Song.select(:id, :spotify_id).where.not(spotify_id: nil).where(preview_url: nil)
+    foundPreviewUrls = 0
 
     # Batch 50 ids and search all at once
     batch = []
+    i = 0
     songs.each do |song|
       # Print progress
       if i%1000 == 0
         puts "Progress: " + i.to_s + "/" + songs.length.to_s
       end
-      i = i + 1
+      i += 1
 
       batch.push(song.spotify_id)
       if batch.length == 50
@@ -274,6 +279,6 @@ namespace :spotify do
       end
     end
     puts "Added preview urls: " + foundPreviewUrls.to_s
-    puts "Prewview urls still missing: " + (Song.count - foundPreviewUrls).to_s
+    puts "Preview urls still missing: " + (Song.count - foundPreviewUrls).to_s
   end
 end

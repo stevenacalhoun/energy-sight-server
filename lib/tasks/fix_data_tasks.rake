@@ -1,14 +1,16 @@
 namespace :fix_data do
   # Fix capitalization errors
   task song_artist_capitalization: :environment do
+    puts "Fixing song/artist capitalization discrepency"
     songsRemoved = 0
     duplicateSongs = Song.select('lower(artist) as artist','lower(title) as title').group('lower(artist)','lower(title)').having("count(*) > 1")
 
-    j = 0
+    i = 0
     duplicateSongs.each do |duplicateSong|
-      if j%100 == 0
-        puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
+      if i%100 == 0
+        puts "Progress: " + i.to_s + "/" + duplicateSongs.length.to_s
       end
+      i += 1
 
       # Get all songs matching this artist/title combo
       matchingSongs = Song.select(:id,:albumArtLink).where("lower(artist) = ? and lower(title) = ?", duplicateSong.artist, duplicateSong.title)
@@ -37,7 +39,6 @@ namespace :fix_data do
           Song.destroy(matchingSong.id)
         end
       end
-      j = j+1
     end
     puts "Removed " + songsRemoved.to_s + " songs"
     puts "Kept " + j.to_s + " songs"
@@ -45,10 +46,14 @@ namespace :fix_data do
 
   # Fix missing articles, remove "featuring" etc.
   task artist_names: :environment do
-    # artists = createArtistDictFromDb()
-    artistChanges = createArtistDictFromFile('artist_names.txt')
+    puts "Normalizing artists' names"
 
-    # correctNames(artistChanges)
+    # Create from database
+    artists = createArtistDictFromDb()
+    correctNames(artistChanges)
+
+    # # Or create from file
+    # artistChanges = createArtistDictFromFile('artist_names.txt')
 
     # # Write to file for inspection
     # open('artist_names2.txt', 'w') { |f|
@@ -69,18 +74,22 @@ namespace :fix_data do
         artistsMatch = Song.select(:artist).where(artist: artist).update_all(artist: artistChanges[artist])
       end
     end
+    puts "Changed " + i.to_s + " artist names"
   end
 
   # Remove duplicate songs based on title/artist
   task duplicate_songs: :environment do
-    duplicateSongs = Song.select(:artist,:title).group(:artist,:title).having("count(*) > 1")
-    puts duplicateSongs.length.to_s + " songs have the same artist and title value"
+    puts "Removing duplicate songs"
 
-    j = 0
+    removedSongs = 0
+    duplicateSongs = Song.select(:artist,:title).group(:artist,:title).having("count(*) > 1")
+
+    i = 0
     duplicateSongs.each do |duplicateSong|
-      if j%100 == 0
-        puts "Progress: " + j.to_s + "/" + duplicateSongs.length.to_s
+      if i%100 == 0
+        puts "Progress: " + i.to_s + "/" + duplicateSongs.length.to_s
       end
+      i += 1
 
       # Get all songs matching this artist/title combo
       matchingSongs = Song.select(:id,:albumArtLink).where(artist: duplicateSong.artist, title: duplicateSong.title)
@@ -98,7 +107,6 @@ namespace :fix_data do
         trueSong = matchingSongs.first
       end
 
-      i = 0
       matchingSongs.each do |matchingSong|
         if matchingSong.id != trueSong.id
           # Update entries to "true song" id
@@ -106,11 +114,11 @@ namespace :fix_data do
 
           # Delete matching song
           Song.destroy(matchingSong.id)
+          removedSongs += 1
         end
-        i = i+1
       end
-      j = j+1
     end
+    puts "Removed " + removedSongs.to_s + " duplicate songs"
   end
 end
 
@@ -122,13 +130,18 @@ def correctNames(artistChanges)
     " & ",
     "/",
     " feat ",
-    " feat.",
     " Feat ",
+    " feat.",
     " Feat.",
+    " feat. ",
+    " Feat. ",
     " ft ",
-    " ft.",
     " Ft ",
+    " ft.",
     " Ft.",
+    " ft. ",
+    " Ft. ",
+    " featured ",
     " Featured ",
     " featuring ",
     " Featuring "

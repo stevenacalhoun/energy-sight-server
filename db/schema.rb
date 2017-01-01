@@ -14,24 +14,7 @@ ActiveRecord::Schema.define(version: 20161222153444) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "hot100_entries", force: :cascade do |t|
-    t.string   "title"
-    t.string   "artist"
-    t.integer  "peakPos"
-    t.integer  "lastPos"
-    t.integer  "weeks"
-    t.integer  "rank"
-    t.string   "change"
-    t.string   "spotifyID"
-    t.string   "spotifyLink"
-    t.string   "videoLink"
-    t.datetime "chartWeek"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-    t.string   "country"
-  end
-
+  
   create_table "songs", force: :cascade do |t|
     t.string   "spotify_id"
     t.string   "artist"
