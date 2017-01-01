@@ -13,7 +13,7 @@ namespace :fix_data do
       i += 1
 
       # Get all songs matching this artist/title combo
-      matchingSongs = Song.select(:id,:albumArtLink).where("lower(artist) = ? and lower(title) = ?", duplicateSong.artist, duplicateSong.title)
+      matchingSongs = Song.select(:id,:albumArtLink).where("lower(artist) = ? and lower(title) = ?", duplicateSong.artist, duplicateSong.title).order(popularity: :desc)
 
       # Pick the song with album art link as the "true song"
       trueSong = nil
@@ -75,6 +75,37 @@ namespace :fix_data do
       end
     end
     puts "Changed " + i.to_s + " artist names"
+  end
+
+  # Remove duplicate songs based on spotify_id
+  task duplicate_songs_on_id: :environment do
+    puts "Removing duplicate songs"
+    removedSongs = 0
+    duplicateSongs = Song.select(:spotify_id).where.not(spotify_id: nil).group(:spotify_id).having("count(*) > 1")
+
+    i = 0
+    duplicateSongs.each do |duplicateSong|
+      if i%100 == 0
+        puts "Progress: " + i.to_s + "/" + duplicateSongs.length.to_s
+      end
+      i += 1
+
+      # Get all songs matching this artist/title combo
+      matchingSongs = Song.select(:id).where(spotify_id: duplicateSong.spotify_id)
+      trueSong = matchingSongs.first
+
+      matchingSongs.each do |matchingSong|
+        if matchingSong.id != trueSong.id
+          # Update entries to "true song" id
+          topChartSongEntries = TopChart.select(:id, :song_id).where(song_id: matchingSong.id).update_all(song_id: trueSong.id)
+
+          # Delete matching song
+          Song.destroy(matchingSong.id)
+          removedSongs += 1
+        end
+      end
+    end
+    puts "Removed " + removedSongs.to_s + " duplicate songs"
   end
 
   # Remove duplicate songs based on title/artist

@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161222153444) do
+ActiveRecord::Schema.define(version: 20170101175338) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  
+
   create_table "songs", force: :cascade do |t|
     t.string   "spotify_id"
     t.string   "artist"
     t.string   "title"
     t.string   "genre"
-    t.string   "albumArtLink"
+    t.string   "album_art_link"
     t.decimal  "danceability"
     t.decimal  "energy"
     t.decimal  "key"
@@ -33,9 +33,11 @@ ActiveRecord::Schema.define(version: 20161222153444) do
     t.decimal  "valence"
     t.decimal  "tempo"
     t.integer  "time_signature"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.string   "preview_url"
+    t.integer  "popularity"
+    t.integer  "spotify_search_count", default: 0
   end
 
   create_table "top_charts", force: :cascade do |t|

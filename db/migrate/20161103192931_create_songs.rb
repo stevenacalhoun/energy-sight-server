@@ -6,8 +6,8 @@ class CreateSongs < ActiveRecord::Migration[5.0]
       t.string :artist
       t.string :title
       t.string :genre
-      t.string :albumArtLink
-
+      t.string :album_art_link
+      
       # Music Attributes
       t.decimal :danceability
       t.decimal :energy

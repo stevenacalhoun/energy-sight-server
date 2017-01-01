@@ -27,7 +27,8 @@ def importCountryData(country)
     i += 1
 
     # Find or create song
-    song = Song.where(title: row[0], artist: row[1], spotify_id: row[7]).first_or_create
+    spotify_id = row[7] == "None" ? nil : row[7]
+    song = Song.where(title: row[0], artist: row[1], spotify_id: spotify_id).first_or_create
 
     # Add top chart entry
     TopChart.create(song_id: song.id, peak_pos: row[2], last_pos: row[3], weeks: row[4], rank: row[5], change: row[6],  chart_week: row[10], country: country, artist: song.artist)
