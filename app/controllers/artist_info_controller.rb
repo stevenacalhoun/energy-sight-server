@@ -1,14 +1,16 @@
 class ArtistInfoController < ApplicationController
   def index
-    render text: 'heyo'
   end
   def show
+    # Get Parameters
     artist = params[:artist]
     earliestDate = Date.parse(params[:startDate])
     latestDate = Date.parse(params[:endDate])
 
+    # Get matching songs
     songs = TopChart.select('top_charts.chart_week, top_charts.country, songs.spotify_id, songs.artist, songs.title, top_charts.rank, songs.preview_url, songs.album_art_link').joins(:song).where('top_charts.chart_week' => earliestDate..(latestDate+7)).where('songs.artist' => artist)
 
+    # Prep data
     songData = {}
     songs.each do |song|
       if songData.key?(song.title) == false
@@ -28,8 +30,10 @@ class ArtistInfoController < ApplicationController
         })
     end
 
+    # Flatten and sort data
     results = flattenDict(songData).sort_by{|obj| obj[:title]}
 
+    # Respond
     render json: results
   end
 end

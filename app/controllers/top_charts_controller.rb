@@ -71,7 +71,6 @@ def createDateArray(startDate, endDate, mode)
   else
     dateArray = ((startDate)..endDate).map{|d| d.month.to_s + "/" + d.year.to_s}.uniq
   end
-
   return dateArray
 end
 
